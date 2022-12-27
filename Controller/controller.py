@@ -156,8 +156,6 @@ def naiveBaiesTrain(X,Y):
     wspam = 0  # quantidade de palavras classificadas spam
     wham = 0  # quantidade de palavras classificadas ham
 
-
-
 #count the occurrence of each word
     for x in range(len(X)):
         email=X[x]
@@ -172,8 +170,6 @@ def naiveBaiesTrain(X,Y):
                 bowIdx = BoW.index(emailSplit[wordIdx])
                 p[1][bowIdx] = p[1][bowIdx] + 1
                 wham+=1
-
-
 #normalize counts; convert absolute frequencies to relative ones
     for bowIdx in range(len(BoW)):
         p[0][bowIdx] =p[0][bowIdx]/wspam
@@ -197,7 +193,9 @@ def classificador(a, b, valor, b_lexico, truePositive, trueNegative, falsePositi
             if j in vetorpalavras:
                 k= vetorpalavras.index(j)
                 x[k] = x[k] + 1  # ler uma mensagem, conta as palavras que constam no lexus e essa conta é o xj
-                t = t + x[k] * (math.log10(vetorclassificadoSpam[k]) - math.log10(vetorclassificadoHam[k]))
+                t=t + 1 * (math.log10(vetorclassificadoSpam[k]) - math.log10(vetorclassificadoHam[k]))
+               # t = t + x[k] * (math.log10(vetorclassificadoSpam[k]) - math.log10(vetorclassificadoHam[k]))
+
         if t> 0:
             classificacao.append("spam")
             classificacaoPredicted.append(0)
@@ -304,176 +302,5 @@ def main_naive(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total_hams
 
     return f"{acc1 * 100:.2f}%", f"{err1 * 100 :.2f}%", f"{sn1 * 100 :.2f}%", f"{sp1 * 100 :.2f}%", f"{p1 * 100 :.2f}%", f"{r1 * 100 :.2f}%", f"{FM1 * 100 :.2f}%",f"{acc2 * 100:.2f}%", f"{err2 * 100 :.2f}%", f"{sn2 * 100 :.2f}%", f"{sp2 * 100 :.2f}%", f"{p2 * 100 :.2f}%", f"{r2 * 100 :.2f}%", f"{FM2 * 100 :.2f}%",f"{ExecutionTime:.2f}s",classificacaoActual,classificacaoPredicted, valorC
 
-
-def BagWordPerceptraoTrain(X,Y):#   BAG OF WORDS
-    BoW= {}     #dicionario de bag of words
-    n=0
-    Y1=np.ones(len(X))
-    for a in range( len(X)):
-        mensagem= X[a]
-        mensagem=mensagem.split()
-        n=n+1
-        if Y[a] =="spam":
-            Y1[a]=-1
-        else:
-            Y1[a]=1
-        for b in range(len(mensagem)):   # vair colocar todas as palavras possiveis nuam 'lista'
-            palavra= mensagem[b]
-            BoW.get(palavra)
-            BoW[palavra] = []  # posiÃ§ao 0 spam, posicao 1 ham
-    vetorpalavras=[]
-    for a in BoW:
-        vetorpalavras.append(a)
-    BoW= vetorpalavras
-    return BoW, n,Y1
-
-def percetrao(X, Y, BoW, n, T):
-    teta = np.zeros(len(BoW))
-    teta0 = 0
-
-    for i in range(n):
-        x = np.zeros(len(BoW))
-        email = X[i]
-        email = email.split()
-        for palavra in email:
-            for k in range(len(BoW)):
-                bag = BoW[k]
-                if palavra == bag:
-                    x[k] = x[k] + 1
-     #   for t in range(0, T):
-        if Y[i] * (np.dot(teta,x))+teta0 <=0:
-        #if Y[i] * (teta @ x + teta0) <= 0:  # @ faz produto interno
-            teta = teta + Y[i] * x
-            teta0 = teta0 + Y[i]
-
-    return teta, teta0
-
-def classificador_perceptrao(X, Y, iteracoes):
-    BoW, n, Y1 = BagWordPerceptraoTrain(X,Y)
-    compara = []
-
-    for d in range(len(iteracoes)):
-        classificacao = np.zeros(len(X))
-        T = iteracoes[d]
-        teta, teta0 = percetrao(X, Y1, BoW, n, T)
-        for i in range(len(X)):
-            x = np.zeros(len(BoW))
-            palavra = X[i]
-            palavra = palavra.split()
-            for j in palavra:
-                for k in range(len(BoW)):
-                    bag = BoW[k]
-                    if j == bag:
-                        x[k] = x[k] + 1
-
-            classificacao[i] = math.copysign(1, (
-                        teta @ x + teta0))  # funcao sign que melhor nos atende Ã© da biblioteca mth. Quando 0, ela vai retornar 1
-        compara.append(classificacao)
-    return compara
-
-
-
-def main_perceptrao(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total_hamspmClassification,total_hamspm_Test,total_hamspmTraining,mTotal):
-    iteracoes = [0.1, 1, 25, 35, 45, 50, 55, 60, 65, 75, 100]
-    messageValidation(X, Y, X_validacao, Y_validacao, mham, mspam, total_hamspmClassification, mTotal)
-    messageTest(X, Y, X_teste, Y_teste, mham, mspam, total_hamspm_Test, mTotal)
-
-    tempo_inicio = time.time()
-
-    compara = classificador_perceptrao(X_validacao, Y_validacao, iteracoes)
-    tp = np.zeros(len(compara))
-    tn = np.zeros(len(compara))
-    fp = np.zeros(len(compara))
-    fn = np.zeros(len(compara))
-    for a in range(len(Y_teste)):
-        if Y_validacao[a] == "ham":
-            Y_validacao[a] = 1
-        elif Y_validacao[a] == "spam":
-            Y_validacao[a] = -1
-        else:
-            print(Y_validacao[a])
-
-    for i in range(len(compara)):
-        gerado = compara[i]
-        for j in range(len(gerado)):
-            etiquetado = gerado[j]
-            etiqueta = Y_validacao[j]
-
-            if etiquetado == etiqueta:
-                if etiquetado == 1:
-                    tp[i] = tp[i] + 1
-                else:
-                    tn[i] = tn[i] + 1
-            else:
-                if etiquetado == 1:
-                    fp[i] = fp[i] + 1
-                else:
-                    fn[i] = fn[i] + 1
-
-    acertos = []
-    for i in range(len(compara)):
-        acertos.append(tp[i] + tn[i])
-    i = acertos.index(max(acertos))
-    acc1, err1, sn1, sp1, p1, r1, FM1, matrizconfusao1 = metricas(tp[i], tn[i], fp[i], fn[i])
-
-    print(f" Para o conjunto de hiperparametros {iteracoes}, o  melhor desempenho esta em T=", iteracoes[i],
-          ", sendo as metricas desse codigo para o conjunto de validacao:")
-    print("Matriz de confusao: \n", matrizconfusao1)
-    print(f"Accurancy: {acc1* 100:.2f}%")
-    print(f"Ratior Error: {err1 * 100 :.2f}%")
-    print(f"Sensitivity: {sn1 * 100 :.2f}%")
-    print(f"Specificity: {sp1 * 100 :.2f}%")
-    print(f"Precision: {p1 * 100 :.2f}%")
-    print(f"Recall: {r1 * 100 :.2f}%")
-    print(f"F-Measure: {FM1 * 100 :.2f}%")
-    print("Conhecendo o melhor hiperparametro, faz-se a classificacao das mensagens de teste, sendo suas metricas:")
-
-    iteracoes = [iteracoes[i]]
-    classifica = classificador_perceptrao(X_teste, Y_teste, iteracoes)
-    tp = np.zeros(len(classifica))
-    tn = np.zeros(len(classifica))
-    fp = np.zeros(len(classifica))
-    fn = np.zeros(len(classifica))
-    for a in range(len(Y_teste)):
-        if Y_teste[a] == "ham":
-            Y_teste[a] = 1
-        elif Y_teste[a] == "spam":
-            Y_teste[a] = -1
-    for i in range(len(classifica)):
-        gerado = classifica[i]
-        for j in range(len(gerado)):
-            etiquetado = gerado[j]
-            etiqueta = Y_teste[j]
-            if etiquetado == etiqueta:
-                if etiquetado == 1:
-                    tp[i] = tp[i] + 1
-                else:
-                    tn[i] = tn[i] + 1
-            else:
-                if etiquetado == 1:
-                    fp[i] = fp[i] + 1
-                else:
-                    fn[i] = fn[i] + 1
-
-    acc2, err2, sn2, sp2, p2, r2, FM2, matrizconfusao2 = metricas(tp[0], tn[0], fp[0], fn[0])
-
-    print("Matriz de confusao : \n", matrizconfusao2)
-    print(f"Accurancy: {acc2 * 100:.2f}%")
-    print(f"Ratior Error: {err2 * 100 :.2f}%")
-    print(f"Sensitivity: {sn2 * 100 :.2f}%")
-    print(f"Specificity: {sp2 * 100 :.2f}%")
-    print(f"Precision: {p2 * 100 :.2f}%")
-    print(f"Recall: {r2 * 100 :.2f}%")
-    print(f"F-Measure: {FM2 * 100 :.2f}%")
-
-    tempo_fim = time.time()
-    ExecutionTime = tempo_fim - tempo_inicio
-    print(f"Tempo total de execucao das classificacoes por algoritmo de Perceptrao: {ExecutionTime:.1f}s")
-    return f"{acc1 * 100:.2f}%", f"{err1 * 100 :.2f}%", f"{sn1 * 100 :.2f}%", f"{sp1 * 100 :.2f}%", f"{p1 * 100 :.2f}%", f"{r1 * 100 :.2f}%", f"{FM1 * 100 :.2f}%",f"{acc2 * 100:.2f}%", f"{err2 * 100 :.2f}%", f"{sn2 * 100 :.2f}%", f"{sp2 * 100 :.2f}%", f"{p2 * 100 :.2f}%", f"{r2 * 100 :.2f}%", f"{FM2 * 100 :.2f}%",f"{ExecutionTime:.2f}s",f"{iteracoes[i]}"
-
-    #   file_import(X,Y,xpto)
-  #  documentFiltering(X, Y)
- #   messageValidation(X, Y, X_validacao, Y_validacao, mham, mspam, total_hamspmClassification, mTotal)
- #   messageTest(X, Y, X_teste, Y_teste, mham, mspam, total_hamspm_Test, mTotal)
 
 

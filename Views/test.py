@@ -1,10 +1,33 @@
-from tkinter import Label
+from random import random
 
-import PIL
-from PIL import ImageTk
+import numpy as np
+import math
+import time
+teta=np.zeros(9)
+x=np.zeros(9)
 
-load = PIL.Image.open("Output.png")
-render = ImageTk.PhotoImage(load)
-img = Label(self, image=render)
-img.image = render
-img.place(x=0, y=0)
+teta[0]=1
+teta[1]=2
+teta[2]=3
+teta[3]=4
+teta[4]=5
+teta[5]=6
+teta[6]=7
+teta[7]=8
+teta[8]=9
+x[0]=1
+x[1]=1
+x[2]=1
+x[3]=1
+x[4]=1
+x[5]=1
+x[6]=1
+x[7]=1
+x[8]=1
+
+
+teta0=1
+
+print(-1 * (np.dot(teta,x)+1))
+
+print(-1*(teta @ x)+1)

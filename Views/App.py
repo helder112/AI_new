@@ -3,19 +3,16 @@ from tkinter import *
 import tkinter.font as tkFont
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
-import time
 import PIL
-import matplotlib
+import numpy as np
 from PIL import ImageSequence, ImageTk
 from matplotlib import pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
 from sklearn import metrics
-
-from Controller import controller
+from Controller import controller,sudokuController
 #from . import Controller as controller
 from threading import Thread
 import pathlib
+
 class App:
 
     def __init__(self, root,xpto=""):
@@ -34,8 +31,9 @@ class App:
         alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
         root.resizable(width=False, height=False)
+        root.config(bg='#1E90FF')
 
-        canvas = tk.Canvas(root, width=1100, height=500)
+        canvas = tk.Canvas(root, width=1100, height=500,bg='#1E90FF')
 
         canvas.pack()
         canvas.tk.call('raise', canvas._w)
@@ -48,6 +46,18 @@ class App:
         GButton_499["text"] = "Calcular Naive Bayes"
         GButton_499.place(x=320, y=450, width=120, height=35)
         GButton_499["command"] = self.GButton_499_command
+
+        sudokuButton = tk.Button(root)
+        sudokuButton["bg"] = "#f0f0f0"
+        ft = tkFont.Font(family='Times', size=10)
+        sudokuButton["font"] = ft
+        sudokuButton["fg"] = "#1005F9"
+        sudokuButton["justify"] = "center"
+        sudokuButton["text"] = "Calcular Sudoku"
+        sudokuButton.place(x=580, y=450, width=120, height=35)
+        sudokuButton["command"] = self.sudokuCommand
+
+
 
 
         GButton_480 = tk.Button(root)
@@ -71,7 +81,7 @@ class App:
         GButton_599.place(x=190, y=450, width=120, height=35)
         GButton_599["command"] = self.GButton_599_command
 
-        GLabel_200 = tk.Label(root)
+        GLabel_200 = tk.Label(root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_200["font"] = ft
         GLabel_200["fg"] = "#333333"
@@ -79,7 +89,7 @@ class App:
         GLabel_200["text"] = "Accurancy:"
         GLabel_200.place(x=40, y=50, width=70, height=25)
 
-        GLabel_186 = tk.Label(root)
+        GLabel_186 = tk.Label(root,bg='#1E90FF')
         GLabel_186["cursor"] = "arrow"
         ft = tkFont.Font(family='Times', size=10)
         GLabel_186["font"] = ft
@@ -88,7 +98,7 @@ class App:
         GLabel_186["text"] = "Ratio Error:"
         GLabel_186.place(x=40, y=80, width=70, height=25)
 
-        GLabel_33 = tk.Label(root)
+        GLabel_33 = tk.Label(root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_33["font"] = ft
         GLabel_33["fg"] = "#333333"
@@ -96,7 +106,7 @@ class App:
         GLabel_33["text"] = "Sensitivity:"
         GLabel_33.place(x=40, y=110, width=70, height=25)
 
-        GLabel_84 = tk.Label(root)
+        GLabel_84 = tk.Label(root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_84["font"] = ft
         GLabel_84["fg"] = "#333333"
@@ -104,7 +114,7 @@ class App:
         GLabel_84["text"] = "Specificity:"
         GLabel_84.place(x=40, y=140, width=70, height=25)
 
-        GLabel_737 = tk.Label(root)
+        GLabel_737 = tk.Label(root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_737["font"] = ft
         GLabel_737["fg"] = "#333333"
@@ -112,7 +122,7 @@ class App:
         GLabel_737["text"] = "Precision:"
         GLabel_737.place(x=40, y=170, width=70, height=25)
 
-        GLabel_898 = tk.Label(root)
+        GLabel_898 = tk.Label(root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_898["font"] = ft
         GLabel_898["fg"] = "#333333"
@@ -120,7 +130,7 @@ class App:
         GLabel_898["text"] = "Recall:"
         GLabel_898.place(x=40, y=200, width=70, height=25)
 
-        GLabel_592 = tk.Label(root)
+        GLabel_592 = tk.Label(root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_592["font"] = ft
         GLabel_592["fg"] = "#333333"
@@ -128,40 +138,41 @@ class App:
         GLabel_592["text"] = "F-Measure:"
         GLabel_592.place(x=40, y=230, width=70, height=25)
 
-        GLabel_685 = tk.Label(root)
-        ft = tkFont.Font(family='Times', size=10)
+        GLabel_685 = tk.Label(root,bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=11)
         GLabel_685["font"] = ft
         GLabel_685["fg"] = "#333333"
         GLabel_685["justify"] = "center"
         GLabel_685["text"] = "Categoria"
-        GLabel_685.place(x=50, y=10, width=70, height=25)
+        GLabel_685.place(x=40, y=20, width=70, height=15)
 
-        GLabel_98 = tk.Label(root)
-        ft = tkFont.Font(family='Times', size=10)
+        GLabel_98 = tk.Label(root,bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=11)
         GLabel_98["font"] = ft
         GLabel_98["fg"] = "#333333"
         GLabel_98["justify"] = "center"
         GLabel_98["text"] = "Validação"
-        GLabel_98.place(x=130, y=10, width=70, height=25)
+        GLabel_98.place(x=130, y=20, width=60, height=15)
 
-        GLabel_961 = tk.Label(root)
-        ft = tkFont.Font(family='Times', size=10)
+        GLabel_961 = tk.Label(root,bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=11)
         GLabel_961["font"] = ft
         GLabel_961["fg"] = "#333333"
         GLabel_961["justify"] = "center"
         GLabel_961["text"] = "Teste"
-        GLabel_961.place(x=200, y=10, width=70, height=25)
+        GLabel_961.place(x=205, y=20, width=70, height=15)
 
-        canvas.create_line(0, 40, 650, 40, fill="Grey", width=3)
-        canvas.create_line(0, 270, 650, 270, fill="Grey", width=3)
-        canvas.create_line(120, 40, 120, 270, fill="Grey", width=3)
+        canvas.create_line(0, 40, 650, 40, fill="White", width=3)
+        canvas.create_line(0, 270, 650, 270, fill="White", width=3)
+        canvas.create_line(120, 0, 120, 270, fill="White", width=3)
 
-        canvas.create_line(200, 40, 200, 270, fill="Grey", width=3)
-        canvas.create_line(3, 40, 3, 448, fill="Grey", width=3)
-        canvas.create_line(650, 39, 650, 450, fill="Grey", width=3)
+        canvas.create_line(200, 0, 200, 270, fill="White", width=3)
+        canvas.create_line(3, 0, 3, 448, fill="White", width=3)
+        canvas.create_line(650, 0, 650, 450, fill="White", width=3)
 
-        canvas.create_line(0, 400, 650, 400, fill="Grey", width=3)
-        canvas.create_line(0, 448, 650, 448, fill="Grey", width=3)
+        canvas.create_line(0, 400, 650, 400, fill="White", width=3)
+        canvas.create_line(0, 448, 650, 448, fill="White", width=3)
+        canvas.create_line(0,3 , 650, 3, fill="White", width=3)
         root.mainloop()
 
     def select_file(root):
@@ -188,7 +199,7 @@ class App:
 
     def GButton_599_command(self):
         self.xpto = self.select_file()
-        GLabel_selectFileLabel = tk.Label(self.root)
+        GLabel_selectFileLabel = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_selectFileLabel["font"] = ft
         GLabel_selectFileLabel["fg"] = "#333333"
@@ -218,7 +229,7 @@ class App:
 
         acc1, err1, sn1, sp1, p1, r1, fm1, acc2, err2, sn2, sp2, p2, r2, fm2, ExecutionTime,T = controller.main_perceptrao(X, Y, X_validacao, Y_validacao, X_teste, Y_teste, mham, mspam, total_hamspmClassification,total_hamspm_Test, total_hamspmTraining, mTotal)
         #acc1, err1, sn1, sp1, p1, r1, fm1, acc2, err2, sn2, sp2, p2, r2, fm2, ExecutionTime, classificacaoActual, classificacaoPredicted, C = controller.main_naive(X, Y, X_validacao, Y_validacao, X_teste, Y_teste, mham, mspam, total_hamspmClassification,total_hamspm_Test, total_hamspmTraining, mTotal)
-        GLabel_270 = tk.Label(self.root,borderwidth=3,relief="groove")
+        GLabel_270 = tk.Label(self.root,borderwidth=3,relief="groove",bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_270["font"] = ft
         GLabel_270["fg"] = "#333333"
@@ -229,14 +240,14 @@ class App:
 
 
 
-        GlabelC= tk.Label(self.root,borderwidth=3,relief="groove")
+        GlabelC= tk.Label(self.root,borderwidth=3,relief="groove",bg='#1E90FF')
         GlabelC["font"] = ft
         GlabelC["fg"] = "#333333"
         GlabelC["justify"] = "center"
         GlabelC["text"] = f"Melhor desempenho em T= {T}"
         GlabelC.place(x=10, y=330, width=170, height=25)
 
-        GLabel_359 = tk.Label(self.root)
+        GLabel_359 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_359["font"] = ft
         GLabel_359["fg"] = "#333333"
@@ -244,7 +255,7 @@ class App:
         GLabel_359["text"] = acc1
         GLabel_359.place(x=130, y=50, width=60, height=25)
 
-        GLabel_383 = tk.Label(self.root)
+        GLabel_383 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_383["font"] = ft
         GLabel_383["fg"] = "#333333"
@@ -252,7 +263,7 @@ class App:
         GLabel_383["text"] = err1
         GLabel_383.place(x=130, y=80, width=60, height=25)
 
-        GLabel_139 = tk.Label(self.root)
+        GLabel_139 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_139["font"] = ft
         GLabel_139["fg"] = "#333333"
@@ -260,7 +271,7 @@ class App:
         GLabel_139["text"] = sn1
         GLabel_139.place(x=130, y=110, width=60, height=25)
 
-        GLabel_453 = tk.Label(self.root)
+        GLabel_453 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_453["font"] = ft
         GLabel_453["fg"] = "#333333"
@@ -268,7 +279,7 @@ class App:
         GLabel_453["text"] = sp1
         GLabel_453.place(x=130, y=140, width=60, height=25)
 
-        GLabel_997 = tk.Label(self.root)
+        GLabel_997 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_997["font"] = ft
         GLabel_997["fg"] = "#333333"
@@ -276,7 +287,7 @@ class App:
         GLabel_997["text"] = p1
         GLabel_997.place(x=130, y=170, width=60, height=25)
 
-        GLabel_437 = tk.Label(self.root)
+        GLabel_437 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_437["font"] = ft
         GLabel_437["fg"] = "#333333"
@@ -284,7 +295,7 @@ class App:
         GLabel_437["text"] = r1
         GLabel_437.place(x=130, y=200, width=60, height=25)
 
-        GLabel_913 = tk.Label(self.root)
+        GLabel_913 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_913["font"] = ft
         GLabel_913["fg"] = "#333333"
@@ -292,7 +303,7 @@ class App:
         GLabel_913["text"] = fm1
         GLabel_913.place(x=130, y=230, width=60, height=25)
 
-        GLabel_995 = tk.Label(self.root)
+        GLabel_995 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_995["font"] = ft
         GLabel_995["fg"] = "#333333"
@@ -301,7 +312,7 @@ class App:
         GLabel_995.place(x=210, y=50, width=60, height=25)
 
 
-        GLabel_496 = tk.Label(self.root)
+        GLabel_496 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_496["font"] = ft
         GLabel_496["fg"] = "#333333"
@@ -309,7 +320,7 @@ class App:
         GLabel_496["text"] =  err2
         GLabel_496.place(x=210, y=80, width=60, height=25)
 
-        GLabel_162 = tk.Label(self.root)
+        GLabel_162 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_162["font"] = ft
         GLabel_162["fg"] = "#333333"
@@ -317,7 +328,7 @@ class App:
         GLabel_162["text"] = sn2
         GLabel_162.place(x=210, y=110, width=60, height=25)
 
-        GLabel_500 = tk.Label(self.root)
+        GLabel_500 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_500["font"] = ft
         GLabel_500["fg"] = "#333333"
@@ -325,7 +336,7 @@ class App:
         GLabel_500["text"] = sp2
         GLabel_500.place(x=210, y=140, width=60, height=25)
 
-        GLabel_63 = tk.Label(self.root)
+        GLabel_63 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_63["font"] = ft
         GLabel_63["fg"] = "#333333"
@@ -333,7 +344,7 @@ class App:
         GLabel_63["text"] = p2
         GLabel_63.place(x=210, y=170, width=60, height=25)
 
-        GLabel_617 = tk.Label(self.root)
+        GLabel_617 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_617["font"] = ft
         GLabel_617["fg"] = "#333333"
@@ -341,7 +352,7 @@ class App:
         GLabel_617["text"] = r2
         GLabel_617.place(x=210, y=200, width=60, height=25)
 
-        GLabel_61 = tk.Label(self.root)
+        GLabel_61 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_61["font"] = ft
         GLabel_61["fg"] = "#333333"
@@ -384,7 +395,7 @@ class App:
         GlabelC["text"] = f"Melhor desempenho em C= {C}"
         GlabelC.place(x=10, y=330, width=170, height=25)
 
-        GLabel_359 = tk.Label(self.root)
+        GLabel_359 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_359["font"] = ft
         GLabel_359["fg"] = "#333333"
@@ -392,7 +403,7 @@ class App:
         GLabel_359["text"] = acc1
         GLabel_359.place(x=130, y=50, width=60, height=25)
 
-        GLabel_383 = tk.Label(self.root)
+        GLabel_383 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_383["font"] = ft
         GLabel_383["fg"] = "#333333"
@@ -400,7 +411,7 @@ class App:
         GLabel_383["text"] = err1
         GLabel_383.place(x=130, y=80, width=60, height=25)
 
-        GLabel_139 = tk.Label(self.root)
+        GLabel_139 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_139["font"] = ft
         GLabel_139["fg"] = "#333333"
@@ -408,7 +419,7 @@ class App:
         GLabel_139["text"] = sn1
         GLabel_139.place(x=130, y=110, width=60, height=25)
 
-        GLabel_453 = tk.Label(self.root)
+        GLabel_453 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_453["font"] = ft
         GLabel_453["fg"] = "#333333"
@@ -416,7 +427,7 @@ class App:
         GLabel_453["text"] = sp1
         GLabel_453.place(x=130, y=140, width=60, height=25)
 
-        GLabel_997 = tk.Label(self.root)
+        GLabel_997 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_997["font"] = ft
         GLabel_997["fg"] = "#333333"
@@ -424,7 +435,7 @@ class App:
         GLabel_997["text"] = p1
         GLabel_997.place(x=130, y=170, width=60, height=25)
 
-        GLabel_437 = tk.Label(self.root)
+        GLabel_437 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_437["font"] = ft
         GLabel_437["fg"] = "#333333"
@@ -432,7 +443,7 @@ class App:
         GLabel_437["text"] = r1
         GLabel_437.place(x=130, y=200, width=60, height=25)
 
-        GLabel_913 = tk.Label(self.root)
+        GLabel_913 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_913["font"] = ft
         GLabel_913["fg"] = "#333333"
@@ -440,7 +451,7 @@ class App:
         GLabel_913["text"] = fm1
         GLabel_913.place(x=130, y=230, width=60, height=25)
 
-        GLabel_995 = tk.Label(self.root)
+        GLabel_995 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_995["font"] = ft
         GLabel_995["fg"] = "#333333"
@@ -449,7 +460,7 @@ class App:
         GLabel_995.place(x=210, y=50, width=60, height=25)
 
 
-        GLabel_496 = tk.Label(self.root)
+        GLabel_496 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_496["font"] = ft
         GLabel_496["fg"] = "#333333"
@@ -457,7 +468,7 @@ class App:
         GLabel_496["text"] =  err2
         GLabel_496.place(x=210, y=80, width=60, height=25)
 
-        GLabel_162 = tk.Label(self.root)
+        GLabel_162 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_162["font"] = ft
         GLabel_162["fg"] = "#333333"
@@ -465,7 +476,7 @@ class App:
         GLabel_162["text"] = sn2
         GLabel_162.place(x=210, y=110, width=60, height=25)
 
-        GLabel_500 = tk.Label(self.root)
+        GLabel_500 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_500["font"] = ft
         GLabel_500["fg"] = "#333333"
@@ -473,7 +484,7 @@ class App:
         GLabel_500["text"] = sp2
         GLabel_500.place(x=210, y=140, width=60, height=25)
 
-        GLabel_63 = tk.Label(self.root)
+        GLabel_63 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_63["font"] = ft
         GLabel_63["fg"] = "#333333"
@@ -481,7 +492,7 @@ class App:
         GLabel_63["text"] = p2
         GLabel_63.place(x=210, y=170, width=60, height=25)
 
-        GLabel_617 = tk.Label(self.root)
+        GLabel_617 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_617["font"] = ft
         GLabel_617["fg"] = "#333333"
@@ -489,7 +500,7 @@ class App:
         GLabel_617["text"] = r2
         GLabel_617.place(x=210, y=200, width=60, height=25)
 
-        GLabel_61 = tk.Label(self.root)
+        GLabel_61 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_61["font"] = ft
         GLabel_61["fg"] = "#333333"
@@ -570,6 +581,46 @@ class App:
          #   T2=Thread(target=self.processing(self.T1))
 
           #  T2.start()
+
+
+    def sudokuCommand(self):
+        sudoku = np.zeros((9, 9))
+        sudoku[0, 2] = 3
+        sudoku[0, 4] = 2
+        sudoku[0, 6] = 6
+        sudoku[1, 0] = 9
+        sudoku[1, 3] = 3
+        sudoku[1, 5] = 5
+        sudoku[1, 8] = 1
+        sudoku[2, 2] = 1
+        sudoku[2, 3] = 8
+        sudoku[2, 5] = 6
+        sudoku[2, 6] = 4
+        sudoku[3, 2] = 8
+        sudoku[3, 3] = 1
+        sudoku[3, 5] = 2
+        sudoku[3, 6] = 9
+        sudoku[4, 0] = 7
+        sudoku[4, 8] = 8
+        sudoku[5, 2] = 6
+        sudoku[5, 3] = 7
+        sudoku[5, 5] = 8
+        sudoku[5, 6] = 2
+        sudoku[6, 2] = 2
+        sudoku[6, 3] = 6
+        sudoku[6, 5] = 9
+        sudoku[6, 6] = 5
+        sudoku[7, 0] = 8
+        sudoku[7, 3] = 2
+        sudoku[7, 5] = 3
+        sudoku[7, 8] = 9
+        sudoku[8, 2] = 5
+        sudoku[8, 4] = 1
+        sudoku[8, 6] = 3
+        dominio = {}
+        restricoes = []
+        sudokuController.iniciar(sudoku, dominio,restricoes)
+
 
 
 
