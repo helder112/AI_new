@@ -27,7 +27,11 @@ x[8]=1
 
 
 teta0=1
+print("NP.DOT-->" )
+print(-1 *( np.dot(teta,x)+1))
 
-print(-1 * (np.dot(teta,x)+1))
+print("NP.mathmult-->")
+print(np.matmul(teta,x))
 
-print(-1*(teta @ x)+1)
+print("@-->")
+print(-1* (teta @ x)+1)

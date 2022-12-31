@@ -225,9 +225,9 @@ class App:
         X, Y, X_validacao, Y_validacao, X_teste, Y_teste, mham, mspam, total_hamspmClassification, total_hamspm_Test, total_hamspmTraining, mTotal = controller.createLists()
 
         #importar ficheiro
-        mspam, mham, mTotal, total_hamspmClassification, total_hamspm_Test, total_hamspmTraining = controller.file_import(X, Y, self.xpto)
+        mspam, mham, mTotal, total_hamspmClassification, total_hamspm_Test, total_hamspmTraining,yclass = controller.file_import(X, Y, self.xpto)
 
-        acc1, err1, sn1, sp1, p1, r1, fm1, acc2, err2, sn2, sp2, p2, r2, fm2, ExecutionTime,T = controller.main_perceptrao(X, Y, X_validacao, Y_validacao, X_teste, Y_teste, mham, mspam, total_hamspmClassification,total_hamspm_Test, total_hamspmTraining, mTotal)
+        acc1, err1, sn1, sp1, p1, r1, fm1, acc2, err2, sn2, sp2, p2, r2, fm2, ExecutionTime,T,Y_teste,classifica = controller.main_perceptrao(X, yclass, X_validacao, Y_validacao, X_teste, Y_teste, mham, mspam, total_hamspmClassification,total_hamspm_Test, total_hamspmTraining, mTotal)
         #acc1, err1, sn1, sp1, p1, r1, fm1, acc2, err2, sn2, sp2, p2, r2, fm2, ExecutionTime, classificacaoActual, classificacaoPredicted, C = controller.main_naive(X, Y, X_validacao, Y_validacao, X_teste, Y_teste, mham, mspam, total_hamspmClassification,total_hamspm_Test, total_hamspmTraining, mTotal)
         GLabel_270 = tk.Label(self.root,borderwidth=3,relief="groove",bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
@@ -363,8 +363,22 @@ class App:
 
        # actual = classificacaoActual
       #  predicted = classificacaoPredicted
+        for i in range(len(Y_teste)):
+            if Y_teste[i]== -1:
+                Y_teste[i] =0
 
-      #  return self.calcularPlot(actual, predicted)
+        for i in range(len(classifica)):
+            asd=classifica[i]
+            if classifica[i]== -1:
+                classifica[i] =0
+
+       # Y_teste[(Y_teste<0)]=0
+       # actual = np.where(Y_teste<0,0,Y_teste)
+       # predicted= np.where(classifica<0,0,classifica)
+
+
+
+        return self.calcularPlot(Y_teste,classifica)
 
 
     def startNaive(self):
@@ -374,7 +388,7 @@ class App:
         GlabelLoading.pack()
 
         X, Y, X_validacao, Y_validacao, X_teste, Y_teste, mham, mspam, total_hamspmClassification, total_hamspm_Test, total_hamspmTraining, mTotal = controller.createLists()
-        mspam, mham, mTotal, total_hamspmClassification, total_hamspm_Test, total_hamspmTraining = controller.file_import(X, Y, self.xpto)
+        mspam, mham, mTotal, total_hamspmClassification, total_hamspm_Test, total_hamspmTraining,yclass = controller.file_import(X, Y, self.xpto)
         acc1, err1, sn1, sp1, p1, r1, fm1, acc2, err2, sn2, sp2, p2, r2, fm2, ExecutionTime,classificacaoActual,classificacaoPredicted,C = controller.main_naive(X, Y, X_validacao, Y_validacao, X_teste, Y_teste, mham, mspam, total_hamspmClassification,total_hamspm_Test, total_hamspmTraining, mTotal)
 
         GLabel_270 = tk.Label(self.root,borderwidth=3,relief="groove")
