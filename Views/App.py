@@ -367,10 +367,6 @@ class App:
             if Y_teste[i]== -1:
                 Y_teste[i] =0
 
-        for i in range(len(classifica)):
-            asd=classifica[i]
-            if classifica[i]== -1:
-                classifica[i] =0
 
        # Y_teste[(Y_teste<0)]=0
        # actual = np.where(Y_teste<0,0,Y_teste)

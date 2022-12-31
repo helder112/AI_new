@@ -455,6 +455,7 @@ def main_perceptrao(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total
     tn = np.zeros(len(classifica))
     fp = np.zeros(len(classifica))
     fn = np.zeros(len(classifica))
+    listTest=[]
     for i in range(len(classifica)):
         gerado = classifica[i]
         for j in range(len(gerado)):
@@ -462,13 +463,17 @@ def main_perceptrao(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total
             etiqueta = Y_teste[j]
             if etiquetado == etiqueta:
                 if etiquetado == 1:
+                    listTest.append(1)
                     tp[i] = tp[i] + 1
                 else:
+                    listTest.append(0)
                     tn[i] = tn[i] + 1
             else:
                 if etiquetado == 1:
+                    listTest.append(1)
                     fp[i] = fp[i] + 1
                 else:
+                    listTest.append(0)
                     fn[i] = fn[i] + 1
 
 
@@ -486,7 +491,7 @@ def main_perceptrao(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total
     tempo_fim = time.time()
     ExecutionTime = tempo_fim - tempo_inicio
     print(f"Tempo total de execuCAo das classificaCOes por algoritmo de PerceptrAo: {ExecutionTime:.1f}s")
-    return f"{acc1 * 100:.2f}%", f"{err1 * 100 :.2f}%", f"{sn1 * 100 :.2f}%", f"{sp1 * 100 :.2f}%", f"{p1 * 100 :.2f}%", f"{r1 * 100 :.2f}%", f"{FM1 * 100 :.2f}%",f"{acc2 * 100:.2f}%", f"{err2 * 100 :.2f}%", f"{sn2 * 100 :.2f}%", f"{sp2 * 100 :.2f}%", f"{p2 * 100 :.2f}%", f"{r2 * 100 :.2f}%", f"{FM2 * 100 :.2f}%",f"{ExecutionTime:.2f}s",f"{iteracoes[i]}",Y_teste,classifica
+    return f"{acc1 * 100:.2f}%", f"{err1 * 100 :.2f}%", f"{sn1 * 100 :.2f}%", f"{sp1 * 100 :.2f}%", f"{p1 * 100 :.2f}%", f"{r1 * 100 :.2f}%", f"{FM1 * 100 :.2f}%",f"{acc2 * 100:.2f}%", f"{err2 * 100 :.2f}%", f"{sn2 * 100 :.2f}%", f"{sp2 * 100 :.2f}%", f"{p2 * 100 :.2f}%", f"{r2 * 100 :.2f}%", f"{FM2 * 100 :.2f}%",f"{ExecutionTime:.2f}s",f"{iteracoes[i]}",Y_teste,listTest
 
 
 
