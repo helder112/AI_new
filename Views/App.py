@@ -20,6 +20,7 @@ class App:
         self.root= root
         self.T1 = Thread()
         self.T2=Thread()
+        self.imgPlot=Label(self.root)
 
         # setting title
         root.title("Naive Bayes and Perceptron")
@@ -223,29 +224,26 @@ class App:
         GlabelLoading.pack()
         #criar Listas vazias
         X, Y, X_validacao, Y_validacao, X_teste, Y_teste, mham, mspam, total_hamspmClassification, total_hamspm_Test, total_hamspmTraining, mTotal = controller.createLists()
-
         #importar ficheiro
         mspam, mham, mTotal, total_hamspmClassification, total_hamspm_Test, total_hamspmTraining,yclass = controller.file_import(X, Y, self.xpto)
-
+        #execucao do algoritmo
         acc1, err1, sn1, sp1, p1, r1, fm1, acc2, err2, sn2, sp2, p2, r2, fm2, ExecutionTime,T,Y_teste,classifica = controller.main_perceptrao(X, yclass, X_validacao, Y_validacao, X_teste, Y_teste, mham, mspam, total_hamspmClassification,total_hamspm_Test, total_hamspmTraining, mTotal)
-        #acc1, err1, sn1, sp1, p1, r1, fm1, acc2, err2, sn2, sp2, p2, r2, fm2, ExecutionTime, classificacaoActual, classificacaoPredicted, C = controller.main_naive(X, Y, X_validacao, Y_validacao, X_teste, Y_teste, mham, mspam, total_hamspmClassification,total_hamspm_Test, total_hamspmTraining, mTotal)
+        #criacao de labels e interface para atualizar com o código depos de executado
+
         GLabel_270 = tk.Label(self.root,borderwidth=3,relief="groove",bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_270["font"] = ft
         GLabel_270["fg"] = "#333333"
         GLabel_270["justify"] = "center"
         GLabel_270["text"] = f"Execution Time: {ExecutionTime}"
-        GLabel_270.place(x=10, y=300, width=170, height=25)
-
-
-
+        GLabel_270.place(x=10, y=300, width=200, height=25)
 
         GlabelC= tk.Label(self.root,borderwidth=3,relief="groove",bg='#1E90FF')
         GlabelC["font"] = ft
         GlabelC["fg"] = "#333333"
         GlabelC["justify"] = "center"
         GlabelC["text"] = f"Melhor desempenho em T= {T}"
-        GlabelC.place(x=10, y=330, width=170, height=25)
+        GlabelC.place(x=10, y=330, width=200, height=25)
 
         GLabel_359 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
@@ -311,7 +309,6 @@ class App:
         GLabel_995["text"] = acc2
         GLabel_995.place(x=210, y=50, width=60, height=25)
 
-
         GLabel_496 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_496["font"] = ft
@@ -361,18 +358,10 @@ class App:
         GLabel_61.place(x=210, y=230, width=60, height=25)
         GlabelLoading["text"] = ""
 
-       # actual = classificacaoActual
-      #  predicted = classificacaoPredicted
+        #mudar do Y_teste de -1 para 0 em spam para validar o plot
         for i in range(len(Y_teste)):
             if Y_teste[i]== -1:
                 Y_teste[i] =0
-
-
-       # Y_teste[(Y_teste<0)]=0
-       # actual = np.where(Y_teste<0,0,Y_teste)
-       # predicted= np.where(classifica<0,0,classifica)
-
-
 
         return self.calcularPlot(Y_teste,classifica)
 
@@ -387,23 +376,23 @@ class App:
         mspam, mham, mTotal, total_hamspmClassification, total_hamspm_Test, total_hamspmTraining,yclass = controller.file_import(X, Y, self.xpto)
         acc1, err1, sn1, sp1, p1, r1, fm1, acc2, err2, sn2, sp2, p2, r2, fm2, ExecutionTime,classificacaoActual,classificacaoPredicted,C = controller.main_naive(X, Y, X_validacao, Y_validacao, X_teste, Y_teste, mham, mspam, total_hamspmClassification,total_hamspm_Test, total_hamspmTraining, mTotal)
 
-        GLabel_270 = tk.Label(self.root,borderwidth=3,relief="groove")
+        GLabel_270 = tk.Label(self.root,borderwidth=3,relief="groove",bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_270["font"] = ft
         GLabel_270["fg"] = "#333333"
         GLabel_270["justify"] = "center"
         GLabel_270["text"] = f"Execution Time: {ExecutionTime}"
-        GLabel_270.place(x=10, y=300, width=170, height=25)
+        GLabel_270.place(x=10, y=300, width=200, height=25)
 
 
 
 
-        GlabelC= tk.Label(self.root,borderwidth=3,relief="groove")
+        GlabelC= tk.Label(self.root,borderwidth=3,relief="groove",bg='#1E90FF')
         GlabelC["font"] = ft
         GlabelC["fg"] = "#333333"
         GlabelC["justify"] = "center"
         GlabelC["text"] = f"Melhor desempenho em C= {C}"
-        GlabelC.place(x=10, y=330, width=170, height=25)
+        GlabelC.place(x=10, y=330, width=200, height=25)
 
         GLabel_359 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
@@ -469,7 +458,6 @@ class App:
         GLabel_995["text"] = acc2
         GLabel_995.place(x=210, y=50, width=60, height=25)
 
-
         GLabel_496 = tk.Label(self.root,bg='#1E90FF')
         ft = tkFont.Font(family='Times', size=10)
         GLabel_496["font"] = ft
@@ -519,35 +507,30 @@ class App:
         GLabel_61.place(x=210, y=230, width=60, height=25)
         GlabelLoading["text"] = ""
 
-        actual = classificacaoActual
-        predicted = classificacaoPredicted
 
-        return self.calcularPlot(actual, predicted)
+        return self.calcularPlot(classificacaoActual, classificacaoPredicted)
 
     def calcularPlot(self,actual,predicted):
 
         cm_display = metrics.ConfusionMatrixDisplay.from_predictions(actual, predicted, cmap="cividis")
-
-        #cm_display.plot(cmap="cividis")
         plt.savefig("Output.png")
         load = PIL.Image.open("Output.png")
         load = load.resize((400, 400))
         render = ImageTk.PhotoImage(load)
-        img = Label(self.root, image=render)
-        img.image = render
-        img.place(x=700, y=0)
+        self.imgPlot=Label(self.root, image=render)
+        #img = Label(self.root, image=render)
+        self.imgPlot.image=render
+       # img.image = render
+        self.imgPlot.place(x=670, y=30)
 
 
         #self.processing("Stop",False)
 
     def processing(self,T1):
-        lbl = Label(self.root)
+        lbl = Label(self.root,bg='#1E90FF')
         lbl.place(x=300, y=150)
         if T1.is_alive():
             img = PIL.Image.open("processing4.gif")
-
-
-
             for img in ImageSequence.Iterator(img):
                 img = img.resize((100, 100))
                 img = ImageTk.PhotoImage(img, )
@@ -560,7 +543,7 @@ class App:
             self.root.update()
 
     def GButton_499_command(self):
-
+        self.resetInterface()
         if self.T1.is_alive():
             showinfo(
                 title='Por favor aguarde',
@@ -571,12 +554,13 @@ class App:
 
             self.T1.start()
 
-           # T2=Thread(target=self.processing(self.T1))
+            T2=Thread(target=self.processing(self.T1))
 
-           # T2.start()
+            T2.start()
 
 
     def GButton_480_command(self):
+        self.resetInterface()
 
         if self.T1.is_alive():
             showinfo(
@@ -588,50 +572,187 @@ class App:
 
             self.T1.start()
 
-         #   T2=Thread(target=self.processing(self.T1))
+            T2=Thread(target=self.processing(self.T1))
 
-          #  T2.start()
+            T2.start()
 
 
     def sudokuCommand(self):
-        sudoku = np.zeros((9, 9))
-        sudoku[0, 2] = 3
-        sudoku[0, 4] = 2
-        sudoku[0, 6] = 6
-        sudoku[1, 0] = 9
-        sudoku[1, 3] = 3
-        sudoku[1, 5] = 5
-        sudoku[1, 8] = 1
-        sudoku[2, 2] = 1
-        sudoku[2, 3] = 8
-        sudoku[2, 5] = 6
-        sudoku[2, 6] = 4
-        sudoku[3, 2] = 8
-        sudoku[3, 3] = 1
-        sudoku[3, 5] = 2
-        sudoku[3, 6] = 9
-        sudoku[4, 0] = 7
-        sudoku[4, 8] = 8
-        sudoku[5, 2] = 6
-        sudoku[5, 3] = 7
-        sudoku[5, 5] = 8
-        sudoku[5, 6] = 2
-        sudoku[6, 2] = 2
-        sudoku[6, 3] = 6
-        sudoku[6, 5] = 9
-        sudoku[6, 6] = 5
-        sudoku[7, 0] = 8
-        sudoku[7, 3] = 2
-        sudoku[7, 5] = 3
-        sudoku[7, 8] = 9
-        sudoku[8, 2] = 5
-        sudoku[8, 4] = 1
-        sudoku[8, 6] = 3
-        dominio = {}
-        restricoes = []
-        sudokuController.iniciar(sudoku, dominio,restricoes)
+
+        if self.T1.is_alive():
+            showinfo(
+                title='Por favor aguarde',
+                message=" O programa está em Execução por favor espere a sua finalização antes de executar o Sudoku!"
+            )
+        else:
+            sudoku = np.zeros((9, 9))
+            sudoku[0, 2] = 3
+            sudoku[0, 4] = 2
+            sudoku[0, 6] = 6
+            sudoku[1, 0] = 9
+            sudoku[1, 3] = 3
+            sudoku[1, 5] = 5
+            sudoku[1, 8] = 1
+            sudoku[2, 2] = 1
+            sudoku[2, 3] = 8
+            sudoku[2, 5] = 6
+            sudoku[2, 6] = 4
+            sudoku[3, 2] = 8
+            sudoku[3, 3] = 1
+            sudoku[3, 5] = 2
+            sudoku[3, 6] = 9
+            sudoku[4, 0] = 7
+            sudoku[4, 8] = 8
+            sudoku[5, 2] = 6
+            sudoku[5, 3] = 7
+            sudoku[5, 5] = 8
+            sudoku[5, 6] = 2
+            sudoku[6, 2] = 2
+            sudoku[6, 3] = 6
+            sudoku[6, 5] = 9
+            sudoku[6, 6] = 5
+            sudoku[7, 0] = 8
+            sudoku[7, 3] = 2
+            sudoku[7, 5] = 3
+            sudoku[7, 8] = 9
+            sudoku[8, 2] = 5
+            sudoku[8, 4] = 1
+            sudoku[8, 6] = 3
+            dominio = {}
+            restricoes = []
+            sudokuController.iniciar(sudoku, dominio,restricoes)
 
 
 
+    def resetInterface(self):
+
+        GLabel_270 = tk.Label(self.root, borderwidth=3, relief="groove", bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_270["font"] = ft
+        GLabel_270["fg"] = "#333333"
+        GLabel_270["justify"] = "center"
+        GLabel_270["text"] = ""
+        GLabel_270.place(x=10, y=300, width=200, height=25)
+
+        GlabelC = tk.Label(self.root, borderwidth=3, relief="groove", bg='#1E90FF')
+        GlabelC["font"] = ft
+        GlabelC["fg"] = "#333333"
+        GlabelC["justify"] = "center"
+        GlabelC["text"] = ""
+        GlabelC.place(x=10, y=330, width=200, height=25)
+
+        GLabel_359 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_359["font"] = ft
+        GLabel_359["fg"] = "#333333"
+        GLabel_359["justify"] = "center"
+        GLabel_359["text"] = ""
+        GLabel_359.place(x=130, y=50, width=60, height=25)
+
+        GLabel_383 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_383["font"] = ft
+        GLabel_383["fg"] = "#333333"
+        GLabel_383["justify"] = "center"
+        GLabel_383["text"] = ""
+        GLabel_383.place(x=130, y=80, width=60, height=25)
+
+        GLabel_139 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_139["font"] = ft
+        GLabel_139["fg"] = "#333333"
+        GLabel_139["justify"] = "center"
+        GLabel_139["text"] = ""
+        GLabel_139.place(x=130, y=110, width=60, height=25)
+
+        GLabel_453 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_453["font"] = ft
+        GLabel_453["fg"] = "#333333"
+        GLabel_453["justify"] = "center"
+        GLabel_453["text"] = ""
+        GLabel_453.place(x=130, y=140, width=60, height=25)
+
+        GLabel_997 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_997["font"] = ft
+        GLabel_997["fg"] = "#333333"
+        GLabel_997["justify"] = "center"
+        GLabel_997["text"] = ""
+        GLabel_997.place(x=130, y=170, width=60, height=25)
+
+        GLabel_437 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_437["font"] = ft
+        GLabel_437["fg"] = "#333333"
+        GLabel_437["justify"] = "center"
+        GLabel_437["text"] = ""
+        GLabel_437.place(x=130, y=200, width=60, height=25)
+
+        GLabel_913 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_913["font"] = ft
+        GLabel_913["fg"] = "#333333"
+        GLabel_913["justify"] = "center"
+        GLabel_913["text"] = ""
+        GLabel_913.place(x=130, y=230, width=60, height=25)
+
+        GLabel_995 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_995["font"] = ft
+        GLabel_995["fg"] = "#333333"
+        GLabel_995["justify"] = "center"
+        GLabel_995["text"] = ""
+        GLabel_995.place(x=210, y=50, width=60, height=25)
+
+        GLabel_496 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_496["font"] = ft
+        GLabel_496["fg"] = "#333333"
+        GLabel_496["justify"] = "center"
+        GLabel_496["text"] = ""
+        GLabel_496.place(x=210, y=80, width=60, height=25)
+
+        GLabel_162 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_162["font"] = ft
+        GLabel_162["fg"] = "#333333"
+        GLabel_162["justify"] = "center"
+        GLabel_162["text"] = ""
+        GLabel_162.place(x=210, y=110, width=60, height=25)
+
+        GLabel_500 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_500["font"] = ft
+        GLabel_500["fg"] = "#333333"
+        GLabel_500["justify"] = "center"
+        GLabel_500["text"] = ""
+        GLabel_500.place(x=210, y=140, width=60, height=25)
+
+        GLabel_63 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_63["font"] = ft
+        GLabel_63["fg"] = "#333333"
+        GLabel_63["justify"] = "center"
+        GLabel_63["text"] = ""
+        GLabel_63.place(x=210, y=170, width=60, height=25)
+
+        GLabel_617 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_617["font"] = ft
+        GLabel_617["fg"] = "#333333"
+        GLabel_617["justify"] = "center"
+        GLabel_617["text"] = ""
+        GLabel_617.place(x=210, y=200, width=60, height=25)
+
+        GLabel_61 = tk.Label(self.root, bg='#1E90FF')
+        ft = tkFont.Font(family='Times', size=10)
+        GLabel_61["font"] = ft
+        GLabel_61["fg"] = "#333333"
+        GLabel_61["justify"] = "center"
+        GLabel_61["text"] = ""
+        GLabel_61.place(x=210, y=230, width=60, height=25)
+
+        self.imgPlot.destroy()
 
 

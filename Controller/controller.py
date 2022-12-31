@@ -360,7 +360,7 @@ def percetrao(X, Y, BoW, n, T):
                     BowIdx=BoW.index(j)
                     x[BowIdx]+=1
             teste1=Y[i] * ( np.dot(teta,x)+ teta0)
-            if Y[i] * (teta @ x + teta0) <= 0:   # @ faz produto interno
+            if Y[i] * (np.dot(teta,x) + teta0)<= 0:   # @ faz produto interno
                 teta= teta + Y[i]* x
                 teta0= teta0 + Y[i]
 
@@ -383,8 +383,7 @@ def classificador_perceptrao(X, Y, iteracoes):
                     BowIdx = BoW.index(j)
                     x[BowIdx] += 1
 
-            classificacao[i] = math.copysign(1, (
-                        teta @ x + teta0))  # funcao sign que melhor nos atende Ã© da biblioteca mth. Quando 0, ela vai retornar 1
+            classificacao[i] = math.copysign(1, (np.dot(teta,x) + teta0)) # funcao sign que melhor nos atende Ã© da biblioteca mth. Quando 0, ela vai retornar 1
         compara.append(classificacao)
     return compara
 
