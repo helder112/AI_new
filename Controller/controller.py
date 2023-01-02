@@ -3,17 +3,7 @@ import math
 import numpy as np
 import csv  # biblioteca necessária para ler ficheiros externos
 import random
-import matplotlib.pyplot as plt
-import seaborn as sns;
-from sklearn import metrics
-
 import string
-
-#sns.set()
-from matplotlib.colors import ListedColormap
-import matplotlib.pyplot as mtp
-
-
 def createLists():
     X = []  # lista de mensagens
     Y = []  # lista de classificação das mensagens
@@ -45,20 +35,15 @@ def file_import(X,Y,xpto):
     Y.pop(0)
     return documentFiltering(X,Y)
 def chartoreject(new_string):
-  #  rejeitar = ':<>=#().",!?|\/*?'  # caracteres a não considerar como palavra na mensagem
-   # chartoreject =[':','<','>','=','#','(',')','.','"',',','!','?','|','/','*','?']
-   # for j in range(len(chartoreject)):
-  #      mensagem = new_string.replace(chartoreject[j], "")
-
+    #remover Pontuacao
     test_str = new_string.translate(str.maketrans('', '', string.punctuation))
-
-   # print(test_str)
-
     return test_str
-    # 5
+
 
 def documentFiltering(X,Y):
+    #criar array de ones apenas no uso do preceptrao
     yclass=np.ones(len(Y))
+    #para cada email na lista de X passar para low case e remover pontuacao, no caso de ser spam ira colocar -1 e de ser ham 1 no numpy ones
     for emailidx in range(len(X)):
         new_string = X[emailidx].lower()
         X[emailidx] = chartoreject(new_string)
@@ -66,10 +51,7 @@ def documentFiltering(X,Y):
             yclass[emailidx]=-1
         else:
             yclass[emailidx] = 1
-
-
-#6 percorrer todas as menssagens e contar se Spam ou Ham e o total de menssagens
-
+    #6 percorrer todas as menssagens e contar se Spam ou Ham e o total de menssagens
     mham= Y.count("ham")
     mspam= Y.count("spam")
     mTotal=len(X)
@@ -79,13 +61,13 @@ def documentFiltering(X,Y):
     return mspam,mham,mTotal,total_hamspmClassification,total_hamspm_Test,total_hamspmTraining,yclass
 
 def messageValidation(X,Y,X_validacao,Y_validacao,mham,mspam,total_hamspmClassification,mTotal):
+    #processamento da lista de validacao ira colocar de forma random 15% de hams e 15% de spams da lista principal
     divisaoham = mham * 0.15
     divisaospam = mspam * 0.15
     divHam = 0
     divSpam = 0
     countdivs = int(divHam) + int(divSpam)
     flag = True
-
     while flag:
         randomNum = random.randrange(len(X))
         if countdivs > total_hamspmClassification:
@@ -115,14 +97,13 @@ def messageValidation(X,Y,X_validacao,Y_validacao,mham,mspam,total_hamspmClassif
             countdivs = int(divHam) + int(divSpam)
 
 def messageTest(X,Y,X_teste,Y_teste,mham,mspam,total_hamspm_Test,mTotal):
+    # processamento da lista de teste ira colocar de forma random 15% de hams e 15% de spams da lista principal
     testHam = mham * 0.15
     testSpam = mspam * 0.15
     divHam = 0
     divSpam = 0
     countdivs = int(divHam) + int(divSpam)
-
     flag = True
-
     while flag:
         randomNum = random.randrange(len(X))
         if countdivs > total_hamspm_Test:
@@ -153,25 +134,25 @@ def messageTest(X,Y,X_teste,Y_teste,mham,mspam,total_hamspm_Test,mTotal):
 
 
 def naiveBaiesTrain(X,Y):
+    #bag of words para o treino de naive
     BoW= []
- #compute D
+    #compute D
     for x in range(len(X)):
         email = X[x]
         emailSplit = email.split()
         for wordIdx in range(len(emailSplit)):
             if not emailSplit[wordIdx] in BoW:
                 BoW.append(emailSplit[wordIdx])
-
     # compute m,mham,mspam
     m = len(X)
     mham = Y.count("ham")
     mspam = Y.count("spam")
     #inicializar P € R^2xn com Pij =1, Wspam=n,Wham=n
     p = np.ones((2, len(BoW)))
-    wspam = 0  # quantidade de palavras classificadas spam
-    wham = 0  # quantidade de palavras classificadas ham
-
-#count the occurrence of each word
+    # variaveris para contar quantidade de palavras classificadas spam e ham
+    wspam = 0
+    wham = 0
+    #count the occurrence of each word
     for x in range(len(X)):
         email=X[x]
         emailSplit= email.split()
@@ -185,24 +166,23 @@ def naiveBaiesTrain(X,Y):
                 bowIdx = BoW.index(emailSplit[wordIdx])
                 p[1][bowIdx] = p[1][bowIdx] + 1
                 wham+=1
-#normalize counts; convert absolute frequencies to relative ones
+    #normalize counts; convert absolute frequencies to relative ones
     for bowIdx in range(len(BoW)):
         p[0][bowIdx] =p[0][bowIdx]/wspam
         p[1][bowIdx] =p[1][bowIdx]/wham
-
     return len(BoW), BoW, p[0],p[1]
 
 
 def classificador(a, b, valor, b_lexico, truePositive, trueNegative, falsePositive, falseNegative,X,Y,mTotal):
+    #classificador do para  naive baies
     classificacao = []
     classificacaoPredicted=[]
     classificacaoActual=[]
-
     n, vetorpalavras, vetorclassificadoSpam, vetorclassificadoHam = naiveBaiesTrain(X,Y)
     for i in range(len(a)):
         x = np.zeros(n)
         t = -b_lexico
-        analise = a[i]  # mensagem que vai analisar
+        analise = a[i]
         analise = analise.split()
         for j in analise:
             if j in vetorpalavras:
@@ -210,15 +190,12 @@ def classificador(a, b, valor, b_lexico, truePositive, trueNegative, falsePositi
                 x[k] = x[k] + 1  # ler uma mensagem, conta as palavras que constam no lexus e essa conta é o xj
                 t=t + 1 * (math.log10(vetorclassificadoSpam[k]) - math.log10(vetorclassificadoHam[k]))
                # t = t + x[k] * (math.log10(vetorclassificadoSpam[k]) - math.log10(vetorclassificadoHam[k]))
-
         if t> 0:
             classificacao.append("spam")
             classificacaoPredicted.append(0)
-
         else:
             classificacao.append("ham")
             classificacaoPredicted.append(1)
-
     for i in range(len(classificacao)):
         if b[i]=="spam":
             classificacaoActual.append(0)
@@ -251,19 +228,15 @@ def metricas(truePositive, trueNegative, falsePositive, falseNegative):
     return acc, err, sn, sp, p, r, FM, matrizconfusao
 
 
-
-
 def main_naive(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total_hamspmClassification,total_hamspm_Test,total_hamspmTraining,mTotal):
     tempo_inicio = time.time()
     messageValidation(X,Y,X_validacao,Y_validacao,mham,mspam,total_hamspmClassification,mTotal)
     messageTest(X,Y,X_teste,Y_teste,mham,mspam,total_hamspm_Test,mTotal)
-    c = [0.1,1,25,35,45,50,55,60,65,75,100]  # c = hiperparametro para classificar se é spam, pre determinar o valor
-
+    c = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]  # c = hiperparametro para classificar se é spam, pre determinar o valor
     truePositive = np.zeros(len(c))
     trueNegative = np.zeros(len(c))
     falsePositive = np.zeros(len(c))
     falseNegative = np.zeros(len(c))
-
     for valor in range(len(c)):
         b_lexico = math.log10(c[valor]) + math.log10(mham) - math.log10(mspam) # to offset the rejection treshold
         truePositive, trueNegative, falsePositive, falseNegative,classificacaoActual,classificacaoPredicted = classificador(X_validacao, Y_validacao, valor, b_lexico, truePositive, trueNegative, falsePositive, falseNegative,X,Y,mTotal)
@@ -271,11 +244,8 @@ def main_naive(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total_hams
     for i in range(len(c)):
         acertos.append(truePositive[i] + trueNegative[i])
     i = acertos.index(max(acertos))
-
     valorC= f"{c[i]}"
-
     acc1, err1, sn1, sp1, p1, r1, FM1, matrizconfusao1 = metricas(truePositive[i], trueNegative[i], falsePositive[i], falseNegative[i])
-
     print(f" Para o conjunto de hiperparametro {c}, o  melhor desempenho está em C=", c[i],
           ", sendo as métricas desse código para o conjunto de validação:")
     print("Matriz de confusão: \n", matrizconfusao1)
@@ -287,7 +257,6 @@ def main_naive(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total_hams
     print(f"Recall: {r1 * 100 :.2f}%")
     print(f"F-Measure: {FM1 * 100 :.2f}%")
     print("Conhecendo o melhor hiperparametro, faz-se a classificacao das mensagens de teste, sendo suas métricas:")
-
     c = c[i]
     b_lexico = math.log10(c) + math.log10(mham) - math.log10(mspam) # to offset the rejection treshold
     valor = 0
@@ -296,9 +265,7 @@ def main_naive(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total_hams
     falsePositive = np.zeros(1)
     falseNegative = np.zeros(1)
     truePositive, trueNegative, falsePositive, falseNegative,classificacaoActual,classificacaoPredicted= classificador(X_teste, Y_teste, valor, b_lexico, truePositive, trueNegative, falsePositive, falseNegative,X,Y,mTotal)
-
     acc2, err2, sn2, sp2, p2, r2, FM2, matrizconfusao2 = metricas(truePositive[0], trueNegative[0], falsePositive[0], falseNegative[0])
-
     print("Matriz de confusão : \n", matrizconfusao2)
     print(f"Accurancy: {acc2 * 100:.2f}%")
     print(f"Ratior Error: {err2 * 100 :.2f}%")
@@ -307,21 +274,13 @@ def main_naive(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total_hams
     print(f"Precision: {p2 * 100 :.2f}%")
     print(f"Recall: {r2 * 100 :.2f}%")
     print(f"F-Measure: {FM2 * 100 :.2f}%")
-
     tempo_fim = time.time()
     ExecutionTime = tempo_fim - tempo_inicio
     print(f"Tempo total de execução da classificação das mensagens por algoritmo de Naive Bayes: {ExecutionTime:.1f}s")
-  #  plotConfusionMatrix(classificacaoActual,classificacaoPredicted)
-
-
-
     return f"{acc1 * 100:.2f}%", f"{err1 * 100 :.2f}%", f"{sn1 * 100 :.2f}%", f"{sp1 * 100 :.2f}%", f"{p1 * 100 :.2f}%", f"{r1 * 100 :.2f}%", f"{FM1 * 100 :.2f}%",f"{acc2 * 100:.2f}%", f"{err2 * 100 :.2f}%", f"{sn2 * 100 :.2f}%", f"{sp2 * 100 :.2f}%", f"{p2 * 100 :.2f}%", f"{r2 * 100 :.2f}%", f"{FM2 * 100 :.2f}%",f"{ExecutionTime:.2f}s",classificacaoActual,classificacaoPredicted, valorC
 
 
-
-
-
-def BagWordPerceptraoTrain(X,Y):#   BAG OF WORDS
+def BagWordPerceptraoTrain(X,Y):#   BAG OF WORDS para preceptrao
     BoW= {}     #dicionario de bag of words
     n=0
   #  Y1=np.ones(len(X))
@@ -333,7 +292,7 @@ def BagWordPerceptraoTrain(X,Y):#   BAG OF WORDS
         for b in range(len(mensagem)):   # vair colocar todas as palavras possiveis nuam 'lista'
             palavra= mensagem[b]
             BoW.get(palavra)
-            BoW[palavra] = []  # posiÃ§ao 0 spam, posicao 1 ham
+            BoW[palavra] = []
     vetorpalavras=[]
     for a in BoW:
         vetorpalavras.append(a)
@@ -341,12 +300,9 @@ def BagWordPerceptraoTrain(X,Y):#   BAG OF WORDS
     return BoW, n
 
 
-
 def percetrao(X, Y, BoW, n, T):
     teta= np.zeros(len(BoW))
     teta0= 0
-
-
     for t in range(T):
       #  print("executar preceptrao 1")
         for i in range(n):
@@ -388,30 +344,17 @@ def classificador_perceptrao(X, Y, iteracoes):
     return compara
 
 
-    #######################################################
-
-
 def main_perceptrao(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total_hamspmClassification,total_hamspm_Test,total_hamspmTraining,mTotal):
-    ###################################################
+    acertos = []
     tempo_inicio = time.time()
     messageValidation(X, Y, X_validacao, Y_validacao, mham, mspam, total_hamspmClassification, mTotal)
-
     messageTest(X, Y, X_teste, Y_teste, mham, mspam, total_hamspm_Test, mTotal)
-
-
-    iteracoes = [1, 5, 10, 15, 35]
-
-    acertos = []
-    classify = []
+    iteracoes = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]
     compara = classificador_perceptrao(X_validacao, Y_validacao, iteracoes)
-
     tp = np.zeros(len(compara))
     tn = np.zeros(len(compara))
     fp = np.zeros(len(compara))
     fn = np.zeros(len(compara))
-    #countspam = Y.count(-1) / len(Y)
-    #countspamvalid = Y_validacao.count(-1) / len(Y_validacao)
-
     for i in range(len(compara)):
         gerado = compara[i]
         for j in range(len(gerado)):
@@ -429,13 +372,10 @@ def main_perceptrao(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total
                 else:
                     fn[i] = fn[i] + 1
 
-    acertos = []
     for i in range(len(compara)):
         acertos.append(tp[i] + tn[i])
     i = acertos.index(max(acertos))
-
     acc1, err1, sn1, sp1, p1, r1, FM1, matrizconfusao1 = metricas(tp[i], tn[i], fp[i], fn[i])
-
     print(f" Para o conjunto de hiperparametros {iteracoes}, o  melhor desempenho está em T=", iteracoes[i],
           ", sendo as métricas desse código para o conjunto de validação:")
     print("Matriz de confusão: \n", matrizconfusao1)
@@ -447,7 +387,6 @@ def main_perceptrao(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total
     print(f"Recall: {r1 * 100 :.2f}%")
     print(f"F-Measure: {FM1 * 100 :.2f}%")
     print("Conhecendo o melhor hiperparametro, faz-se a classificacao das mensagens de teste, sendo suas métricas:")
-
     iteracoes = [iteracoes[i]]
     classifica = classificador_perceptrao(X_teste, Y_teste, iteracoes)
     tp = np.zeros(len(classifica))
@@ -474,10 +413,7 @@ def main_perceptrao(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total
                 else:
                     listTest.append(0)
                     fn[i] = fn[i] + 1
-
-
     acc2, err2, sn2, sp2, p2, r2, FM2, matrizconfusao2 = metricas(tp[0], tn[0], fp[0], fn[0])
-
     print("Matriz de confusão : \n", matrizconfusao2)
     print(f"Accurancy: {acc2 * 100:.2f}%")
     print(f"Ratior Error: {err2 * 100 :.2f}%")
@@ -486,15 +422,7 @@ def main_perceptrao(X,Y,X_validacao,Y_validacao,X_teste,Y_teste,mham,mspam,total
     print(f"Precision: {p2 * 100 :.2f}%")
     print(f"Recall: {r2 * 100 :.2f}%")
     print(f"F-Measure: {FM2 * 100 :.2f}%")
-
     tempo_fim = time.time()
     ExecutionTime = tempo_fim - tempo_inicio
     print(f"Tempo total de execuCAo das classificaCOes por algoritmo de PerceptrAo: {ExecutionTime:.1f}s")
     return f"{acc1 * 100:.2f}%", f"{err1 * 100 :.2f}%", f"{sn1 * 100 :.2f}%", f"{sp1 * 100 :.2f}%", f"{p1 * 100 :.2f}%", f"{r1 * 100 :.2f}%", f"{FM1 * 100 :.2f}%",f"{acc2 * 100:.2f}%", f"{err2 * 100 :.2f}%", f"{sn2 * 100 :.2f}%", f"{sp2 * 100 :.2f}%", f"{p2 * 100 :.2f}%", f"{r2 * 100 :.2f}%", f"{FM2 * 100 :.2f}%",f"{ExecutionTime:.2f}s",f"{iteracoes[i]}",Y_teste,listTest
-
-
-
-
-    ####################################################
-
-

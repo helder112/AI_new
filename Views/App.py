@@ -527,20 +527,24 @@ class App:
         #self.processing("Stop",False)
 
     def processing(self,T1):
-        lbl = Label(self.root,bg='#1E90FF')
-        lbl.place(x=300, y=150)
-        if T1.is_alive():
-            img = PIL.Image.open("processing4.gif")
-            for img in ImageSequence.Iterator(img):
-                img = img.resize((100, 100))
-                img = ImageTk.PhotoImage(img, )
-                lbl.config(image=img)
+        try:
+
+            lbl = Label(self.root,bg='#1E90FF')
+            lbl.place(x=300, y=150)
+            if T1.is_alive():
+                img = PIL.Image.open("processing4.gif")
+                for img in ImageSequence.Iterator(img):
+                    img = img.resize((100, 100))
+                    img = ImageTk.PhotoImage(img, )
+                    lbl.config(image=img)
+                    self.root.update()
+                self.root.after(0, self.processing(T1))
+            else:
+                img=""
+                lbl.destroy()
                 self.root.update()
-            self.root.after(0, self.processing(T1))
-        else:
-            img=""
-            lbl.destroy()
-            self.root.update()
+        except:
+            self.processing(T1)
 
     def GButton_499_command(self):
         self.resetInterface()
